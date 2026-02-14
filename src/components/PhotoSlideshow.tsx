@@ -5,14 +5,16 @@ import FloatingHearts from "./FloatingHearts";
 
 const slides = [
   { type: "image", src: "https://cdn.pixabay.com/photo/2021/09/06/05/55/love-6600906_1280.jpg", caption: "You make the ordinary feel extraordinary ✨" },
-  { type: "image", src: "https://t3.ftcdn.net/jpg/10/02/73/78/360_F_1002737826_NiCfcJukqpCzQHNABNKB1D9qVS6uQXK4.jpg", caption: "Every story has a beginning… ours started with you 💫" },
-  { type: "image", src: "https://videocdn.cdnpk.net/videos/01d753e6-fb9a-5214-9fe0-6bca51e5097b/horizontal/thumbnails/large.jpg?semt=ais_hybrid&item_id=6624429&w=740&q=80", caption: "Some people are magic. You’re proof💫" },
-  { type: "image", src: "https://img.freepik.com/free-photo/lovely-young-couple-dancing-together-near-seacoast-beach_23-2148103108.jpg?semt=ais_hybrid&w=740&q=80", caption: "Some moments are just worth holding onto forever 🤍" },
+  { type: "image", src: "https://plus.unsplash.com/premium_photo-1671050939936-4a538e3b9205?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", caption: "Every story has a beginning… ours started with you 💫" },
+  { type: "video", src: "https://res.cloudinary.com/dohedj1jl/video/upload/v1770588387/Download_bgr5el.mp4", caption: "The first song we heard together wasn’t just music… it was the beginning of us 🎵✨"},
+  { type: "image", src: "https://plus.unsplash.com/premium_photo-1661313636445-5993194ca9a7?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", caption: "Some people are magic. You’re proof💫" },
+  { type: "image", src: "https://plus.unsplash.com/premium_photo-1666299272101-53653a6ba99f?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDE3fHx8ZW58MHx8fHx8", caption: "Some moments are just worth holding onto forever 🤍" },
   { type: "image", src: "https://st3.depositphotos.com/7037632/18848/i/450/depositphotos_188486718-stock-photo-romantic-fairytale-happy-newlywed-couple.jpg", caption: "With you, even silence feels like a conversation 💭" },
-  { type: "image", src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTm8IbdtueToLOULJ79Q62niEvv_Hvxw9cg7A&s", caption: "You're my favorite notification 📱" },
-  { type: "image", src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk9XPX2GgLKn7krM8GpGQTdUlyHpXT1bsAYg&s", caption: "Life's better with you in it, no doubt about that 🌙" },
-  { type: "image", src: "https://thumbs.dreamstime.com/b/bride-groom-near-lake-wedding-day-83197782.jpg", caption: "This smile? Yeah, that's because of you 😊 ✨" },
+  { type: "image", src: "https://plus.unsplash.com/premium_photo-1723701814402-1b2bc210db07?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", caption: "You're my favorite notification 📱" },
+  { type: "image", src: "https://plus.unsplash.com/premium_photo-1661434268496-b14b43ae5251?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", caption: "Life's better with you in it, no doubt about that 🌙" },
+  { type: "image", src: "https://plus.unsplash.com/premium_photo-1658506620933-8705b4c85f7d?q=80&w=688&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", caption: "This smile? Yeah, that's because of you 😊 ✨" },
   { type: "video", src: "https://www.pexels.com/download/video/18294808/", caption: "You don’t just change moments… you turn them into memories ✨" },
+
 ];
 
 const finalSlide = {
@@ -138,57 +140,98 @@ const PhotoSlideshow = () => {
   </motion.span>
 </motion.div>
 
+<AnimatePresence mode="wait">
+  {!isFinal ? (
+    <motion.div
+      key={current}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.8 }}
+      className="absolute inset-0"
+    >
+      {slides[current].type === "image" && (
+        <div
+          className="absolute inset-0 bg-cover bg-center blur-2xl scale-110 opacity-40"
+          style={{ backgroundImage: `url(${slides[current].src})` }}
+        />
+      )}
 
-      <AnimatePresence mode="wait">
-        {!isFinal ? (
-          <motion.div
-            key={current}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
-            className="absolute inset-0"
-          >
-            {slides[current].type === "image" && (
-              <div
-                className="absolute inset-0 bg-cover bg-center blur-2xl scale-110 opacity-40"
-                style={{ backgroundImage: `url(${slides[current].src})` }}
-              />
-            )}
+      {slides[current].type === "video" ? (
+        <video
+          ref={videoRef}
+          src={slides[current].src}
+          className="absolute inset-0 w-full h-full object-contain"
+          autoPlay
+          loop
+          playsInline
+        />
+      ) : (
+        <img
+          src={slides[current].src}
+          alt=""
+          className="absolute inset-0 w-full h-full object-contain"
+        />
+      )}
 
-            {slides[current].type === "video" ? (
-              <video
-                ref={videoRef}
-                src={slides[current].src}
-                className="absolute inset-0 w-full h-full object-contain"
-                autoPlay
-                loop
-                playsInline
-              />
-            ) : (
-              <img
-                src={slides[current].src}
-                alt=""
-                className="absolute inset-0 w-full h-full object-contain"
-              />
-            )}
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 z-10">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+          className="text-2xl md:text-4xl font-semibold text-foreground leading-relaxed max-w-2xl"
+          style={{ fontFamily: "'Playfair Display', serif" }}
+        >
+          {slides[current].caption}
+        </motion.p>
+      </div>
+    </motion.div>
+) : (
+  <motion.div
+    key="final"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.8 }}
+    className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
+  >
+    <motion.p
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3, duration: 0.6 }}
+      className="text-2xl md:text-4xl font-semibold text-foreground leading-relaxed max-w-3xl"
+      style={{ fontFamily: "'Playfair Display', serif" }}
+    >
+      {finalSlide.mainMessage}
+    </motion.p>
 
-            <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 z-10">
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-                className="text-2xl md:text-4xl font-semibold text-foreground leading-relaxed max-w-2xl"
-                style={{ fontFamily: "'Playfair Display', serif" }}
-              >
-                {slides[current].caption}
-              </motion.p>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+    {/* Secret Button */}
+    <motion.button
+      onClick={() => setShowSecret((s) => !s)}
+      whileTap={{ scale: 0.95 }}
+      className="mt-8 px-6 py-3 rounded-full 
+      bg-muted/30 backdrop-blur-sm border border-border 
+      text-sm text-foreground transition hover:bg-muted/50"
+    >
+      Tap me… 💌
+    </motion.button>
+
+    {showSecret && (
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="mt-6 text-lg text-primary"
+      >
+        {finalSlide.secretMessage}
+      </motion.p>
+    )}
+  </motion.div>
+)
+}
+</AnimatePresence>
+
 
       {/* Navigation */}
       <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-4 z-20">
