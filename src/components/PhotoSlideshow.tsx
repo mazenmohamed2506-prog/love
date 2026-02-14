@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Volume2, VolumeX } from "lucide-react";
 import FloatingHearts from "./FloatingHearts";
 
-// Photos — replace these paths with your actual uploaded images
 const slides = [
   { type: "image", src: "https://cdn.pixabay.com/photo/2021/09/06/05/55/love-6600906_1280.jpg", caption: "You make the ordinary feel extraordinary ✨" },
   { type: "image", src: "https://t3.ftcdn.net/jpg/10/02/73/78/360_F_1002737826_NiCfcJukqpCzQHNABNKB1D9qVS6uQXK4.jpg", caption: "Every story has a beginning… ours started with you 💫" },
@@ -14,7 +13,6 @@ const slides = [
   { type: "image", src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTk9XPX2GgLKn7krM8GpGQTdUlyHpXT1bsAYg&s", caption: "Life's better with you in it, no doubt about that 🌙" },
   { type: "image", src: "https://thumbs.dreamstime.com/b/bride-groom-near-lake-wedding-day-83197782.jpg", caption: "This smile? Yeah, that's because of you 😊 ✨" },
   { type: "video", src: "https://www.pexels.com/download/video/18294808/", caption: "You don’t just change moments… you turn them into memories ✨" },
-
 ];
 
 const finalSlide = {
@@ -28,12 +26,52 @@ const PhotoSlideshow = () => {
   const [showSecret, setShowSecret] = useState(false);
   const [muted, setMuted] = useState(false);
 
+  const [timeTogether, setTimeTogether] = useState({
+    years: 0,
+    months: 0,
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const totalSlides = slides.length + 1; // +1 for final slide
+  const totalSlides = slides.length + 1;
 
-  // Start music
+  // 🔥 عدل التاريخ هنا
+  const startDate = new Date("2024-06-01T00:00:00");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date();
+      let diff = now.getTime() - startDate.getTime();
+
+      const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+      diff %= 1000 * 60 * 60 * 24 * 365;
+
+      const months = Math.floor(diff / (1000 * 60 * 60 * 24 * 30));
+      diff %= 1000 * 60 * 60 * 24 * 30;
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      diff %= 1000 * 60 * 60 * 24;
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      diff %= 1000 * 60 * 60;
+
+      const minutes = Math.floor(diff / (1000 * 60));
+      diff %= 1000 * 60;
+
+      const seconds = Math.floor(diff / 1000);
+
+      setTimeTogether({ years, months, days, hours, minutes, seconds });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Music
   useEffect(() => {
     const audio = new Audio("/music/60625.mp3");
     audio.loop = true;
@@ -46,84 +84,60 @@ const PhotoSlideshow = () => {
     };
   }, []);
 
-  // Mute toggle for background music only (keeps your current behavior)
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.muted = muted;
     }
   }, [muted]);
 
-  // Auto switch audio: when video slide -> pause music + play video sound
-  // when image slide -> pause video + resume music
   useEffect(() => {
     const currentSlide = slides[current];
 
-    // When we are on the final slide (no slide object), stop video and resume music
-    if (!currentSlide) {
-      if (videoRef.current) {
-        videoRef.current.pause();
-        videoRef.current.currentTime = 0;
-      }
-      if (audioRef.current) {
-        audioRef.current.play().catch(() => {});
-      }
-      return;
-    }
+    if (!currentSlide) return;
 
     if (currentSlide.type === "video") {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      if (videoRef.current) {
-        videoRef.current.currentTime = 0;
-        videoRef.current.muted = false;
-        videoRef.current.play().catch(() => {});
-      }
+      audioRef.current?.pause();
+      videoRef.current?.play().catch(() => {});
     } else {
-      if (videoRef.current) {
-        videoRef.current.pause();
-        videoRef.current.currentTime = 0;
-      }
-      if (audioRef.current) {
-        audioRef.current.play().catch(() => {});
-      }
+      videoRef.current?.pause();
+      audioRef.current?.play().catch(() => {});
     }
   }, [current]);
 
   const prev = () => setCurrent((c) => Math.max(0, c - 1));
   const next = () => setCurrent((c) => Math.min(totalSlides - 1, c + 1));
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight" || e.key === " ") next();
-      if (e.key === "ArrowLeft") prev();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Touch swipe
-  const touchStart = useRef(0);
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStart.current = e.touches[0].clientX;
-  };
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const diff = touchStart.current - e.changedTouches[0].clientX;
-    if (diff > 50) next();
-    if (diff < -50) prev();
-  };
-
   const isFinal = current === slides.length;
 
   return (
-    <div
-      className="fixed inset-0 bg-background overflow-hidden"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
+    <div className="fixed inset-0 bg-background overflow-hidden">
       <FloatingHearts />
+
+      {/* 💎 Counter */}
+      <motion.div
+  animate={{ scale: [1, 1.03, 1] }}
+  transition={{ duration: 3, repeat: Infinity }}
+  className="absolute top-6 left-6 px-6 py-4 rounded-full 
+  bg-muted/30 backdrop-blur-sm border border-border 
+  text-foreground text-base md:text-lg font-medium z-20
+  flex flex-col items-center text-center"
+>
+  <motion.span
+    key={timeTogether.seconds}
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.4 }}
+  >
+    Forever 🤍
+    <br />
+    {timeTogether.years}Y · {timeTogether.months}M · {timeTogether.days}D ·{" "}
+    {timeTogether.hours}H · {timeTogether.minutes}M ·{" "}
+    <span className="text-primary font-semibold">
+      {timeTogether.seconds}s
+    </span>
+  </motion.span>
+</motion.div>
+
 
       <AnimatePresence mode="wait">
         {!isFinal ? (
@@ -135,7 +149,6 @@ const PhotoSlideshow = () => {
             transition={{ duration: 0.8 }}
             className="absolute inset-0"
           >
-            {/* Blurred background for images only */}
             {slides[current].type === "image" && (
               <div
                 className="absolute inset-0 bg-cover bg-center blur-2xl scale-110 opacity-40"
@@ -143,7 +156,6 @@ const PhotoSlideshow = () => {
               />
             )}
 
-            {/* Main content */}
             {slides[current].type === "video" ? (
               <video
                 ref={videoRef}
@@ -161,10 +173,8 @@ const PhotoSlideshow = () => {
               />
             )}
 
-            {/* Gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
-            {/* Caption */}
             <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 z-10">
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
@@ -177,59 +187,7 @@ const PhotoSlideshow = () => {
               </motion.p>
             </div>
           </motion.div>
-        ) : (
-          <motion.div
-            key="final"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
-            className="absolute inset-0 flex flex-col items-center justify-center p-8 z-10"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-              className="max-w-lg text-center"
-            >
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="text-6xl mb-8"
-              >
-                💛
-              </motion.div>
-
-              <p
-                className="text-xl md:text-2xl text-foreground leading-relaxed mb-10"
-                style={{ fontFamily: "'Playfair Display', serif" }}
-              >
-                {finalSlide.mainMessage}
-              </p>
-
-              <AnimatePresence>
-                {showSecret ? (
-                  <motion.p
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-lg text-primary font-semibold"
-                  >
-                    {finalSlide.secretMessage}
-                  </motion.p>
-                ) : (
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowSecret(true)}
-                    className="px-6 py-3 rounded-full bg-muted/50 border border-border text-muted-foreground text-sm backdrop-blur-sm hover:text-foreground transition-colors"
-                  >
-                    Tap me… 👀
-                  </motion.button>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          </motion.div>
-        )}
+        ) : null}
       </AnimatePresence>
 
       {/* Navigation */}
@@ -242,7 +200,6 @@ const PhotoSlideshow = () => {
           <ChevronLeft className="w-5 h-5" />
         </button>
 
-        {/* Dots */}
         <div className="flex gap-1.5">
           {Array.from({ length: totalSlides }).map((_, i) => (
             <button
@@ -264,7 +221,6 @@ const PhotoSlideshow = () => {
         </button>
       </div>
 
-      {/* Mute toggle */}
       <button
         onClick={() => setMuted((m) => !m)}
         className="absolute top-6 right-6 p-2 rounded-full bg-muted/30 backdrop-blur-sm border border-border text-foreground z-20 hover:bg-muted/50 transition-colors"
@@ -272,8 +228,7 @@ const PhotoSlideshow = () => {
         {muted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
       </button>
 
-      {/* Slide counter */}
-      <div className="absolute top-6 left-6 text-muted-foreground text-sm z-20">
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 text-muted-foreground text-sm z-20">
         {current + 1} / {totalSlides}
       </div>
     </div>
